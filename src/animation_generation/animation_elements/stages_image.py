@@ -1,6 +1,6 @@
 from src.animation_generation.animation_elements.gauge import plot_gauge
+from src.compression_simplified import CompressionSimplified
 from src.animation_generation.costants import IMG_DIRECTORY
-from matplotlib.font_manager import FontProperties
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -16,11 +16,22 @@ HW_ratios = {
 
 start_x_movement = 0.73
 
-
 def plot_stages(
 
+        axis, cs: CompressionSimplified
+
+):
+
+    n_stages = cs.n_stages
+    for stage in range(n_stages):
+
+        pass
+
+def __plot_stages(
+
         axis, n_stages,
-        activation_list
+        activation_list,
+        perc_list
 
 ):
     axis.set_axis_off()
@@ -31,7 +42,7 @@ def plot_stages(
 
         start_x += __add_stage(
 
-            axis, is_active=activation_list[0],
+            axis, is_active=activation_list[0], perc=perc_list[0],
             stage_type="First", height=best_height
 
         )
@@ -40,7 +51,8 @@ def plot_stages(
 
         start_x += __add_stage(
 
-            axis, is_active=activation_list[stage],prev_is_active=activation_list[stage-1],
+            axis, is_active=activation_list[stage], perc=perc_list[stage],
+            prev_is_active=activation_list[stage-1],
             start_x=start_x, height=best_height
 
         )
@@ -52,16 +64,17 @@ def plot_stages(
 
     __add_stage(
 
-        axis, is_active=activation_list[-1], prev_is_active=pre_active,
-        start_x=start_x, stage_type="Last",
-        height=best_height
+        axis, is_active=activation_list[-1], perc=perc_list[-1],
+        prev_is_active=pre_active, start_x=start_x,
+        stage_type="Last", height=best_height
 
     )
 
 
 def __add_stage(
 
-        axis, is_active, prev_is_active=True,
+        axis, is_active, perc,
+        prev_is_active=True,
         start_x=0, stage_type="",
         height=0.5
 
@@ -86,7 +99,7 @@ def __add_stage(
     img = plt.imread(os.path.join(IMG_DIRECTORY, "stages", "{}Stage-{}{}.png".format(stage_type, active_name, prev_active_name)))
     ax.imshow(img, extent=[0, 1, 0, 1], aspect='auto')
 
-    __add_gauge(ax, stage_type=stage_type)
+    __add_gauge(ax, perc, stage_type=stage_type)
 
     return start_x_movement * HW_ratios[stage_type] * height
 
@@ -130,5 +143,5 @@ def __calculate_best_height(axis, n_stages):
 if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    plot_stages(ax, 3, [True, True, False])
+    __plot_stages(ax, 3, [True, True, False], [1, 0.43, 0.])
     plt.show()
