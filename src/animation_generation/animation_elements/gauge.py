@@ -1,4 +1,4 @@
-from src.animation_generation.costants import IMG_DIRECTORY, OUTPUT_DIRECTORY
+from src.animation_generation.costants import IMG_DIRECTORY
 from matplotlib.font_manager import FontProperties
 import matplotlib.pyplot as plt
 import numpy as np
