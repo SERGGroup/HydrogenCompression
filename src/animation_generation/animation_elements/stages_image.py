@@ -14,7 +14,7 @@ HW_ratios = {
 
 }
 
-start_x_movement = 0.7615
+start_x_movement = 0.73
 
 
 def plot_stages(
@@ -40,14 +40,19 @@ def plot_stages(
 
         start_x += __add_stage(
 
-            axis, is_active=activation_list[stage],
+            axis, is_active=activation_list[stage],prev_is_active=activation_list[stage-1],
             start_x=start_x, height=best_height
 
         )
 
+    if n_stages>2:
+        pre_active = activation_list[-2]
+    else:
+        pre_active = False
+
     __add_stage(
 
-        axis, is_active=activation_list[- 1],
+        axis, is_active=activation_list[-1], prev_is_active=pre_active,
         start_x=start_x, stage_type="Last",
         height=best_height
 
@@ -56,7 +61,7 @@ def plot_stages(
 
 def __add_stage(
 
-        axis, is_active,
+        axis, is_active, prev_is_active=True,
         start_x=0, stage_type="",
         height=0.5
 
@@ -68,12 +73,17 @@ def __add_stage(
     if is_active:
 
         active_name = "Active"
+        prev_active_name = ""
 
     else:
 
         active_name = "Inactive"
+        prev_active_name = ""
 
-    img = plt.imread(os.path.join(IMG_DIRECTORY, "stages", "{}Stage-{}.png".format(stage_type, active_name)))
+        if not stage_type == "First" and not prev_is_active:
+            prev_active_name = "-Inactive"
+
+    img = plt.imread(os.path.join(IMG_DIRECTORY, "stages", "{}Stage-{}{}.png".format(stage_type, active_name, prev_active_name)))
     ax.imshow(img, extent=[0, 1, 0, 1], aspect='auto')
 
     return start_x_movement * HW_ratios[stage_type] * height
@@ -99,5 +109,5 @@ def __calculate_best_height(axis, n_stages):
 if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    plot_stages(ax, 3, [True,True,True, True, True, True])
+    plot_stages(ax, 1, [False])
     plt.show()
