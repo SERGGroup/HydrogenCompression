@@ -1,12 +1,9 @@
 from REFPROPConnector import ThermodynamicPoint
-import matplotlib.animation as ani
-import matplotlib.pyplot as plt
-from PIL import Image
 from sty import ef
-import numpy, os
+import numpy
 
 
-class CompressionStage:
+class CompressionSimplified:
 
     def __init__(
 
@@ -245,108 +242,3 @@ class CompressionStage:
             rows_str
 
         )
-
-
-OUTPUT_DIRECTORY = os.path.join(os.path.dirname(os.path.dirname(__file__)), "res", "output")
-IMG_DIRECTORY = os.path.join(os.path.dirname(os.path.dirname(__file__)), "res", "img")
-class CompressionStageImgGenerator:
-
-    def __init__(self, compression_stage:CompressionStage):
-
-        self.cs = compression_stage
-        self.cs.update_state(self.cs.t_max)
-        self.x_max = self.cs.t_max / 60 * 1.1
-        self.y_max = [self.cs.comp_power * 1.1, self.cs.P_max * 1.1]
-        self.colors = ['blue', 'orange']
-
-        self.__init_values()
-
-    def __init_values(self):
-
-        self.x_values = list()
-        self.y_values = list()
-        self.y_right_values = list()
-
-    def __init_figure(self):
-
-        self.__init_values()
-        self.im = Image.open(os.path.join(IMG_DIRECTORY, "prova.png"))
-        self.height = self.im.size[1]
-
-        self.fig = plt.figure(figsize=[8, 5])
-        return self.fig
-
-    def __generate_plot(self):
-
-        plt.clf()
-        #self.fig.figimage(self.im, 0, 0)
-
-        ax = plt.gca()
-
-        p = plt.plot(self.x_values, self.y_values, label='Comp Power', zorder=1)
-        p[0].set_color(self.colors[0])
-
-        ax_right = ax.twinx()
-        p = plt.plot(self.x_values, self.y_right_values, label='Tank Pressure', zorder=2)
-        p[0].set_color(self.colors[1])
-
-        ax.set_xlim([0, self.x_max])
-        ax.set_ylim([0, self.y_max[0]])
-        ax_right.set_ylim([0, self.y_max[1]])
-
-        ax.set_xlabel('Time [min]')
-        ax.set_ylabel('Compressors Power [kW]\n({})'.format(self.colors[0]))
-        ax_right.set_ylabel('Tank Pressure [bar]\n({})'.format(self.colors[1]))
-
-    def append_values(self, i):
-
-        t = self.cs.t_max * float(i) / 100
-        self.cs.update_state(t)
-
-        self.x_values.append(t / 60)
-        self.y_values.append(self.cs.comp_power)
-        self.y_right_values.append(self.cs.tp_points[-1].get_variable("P") * 10)
-
-    def plt_img_frame(self, i=100, plot_img_alone=False):
-
-            if not plot_img_alone:
-
-                self.append_values(i)
-
-            else:
-
-                self.__init_figure()
-
-                for i in range(0, 100 + 5, 5):
-
-                    self.append_values(i)
-
-            self.__generate_plot()
-
-            if plot_img_alone:
-
-                plt.show()
-
-    def export_filling_gif(self, gif_name="filling", step=1):
-
-        file_name = gif_name + ".gif"
-        file_path = os.path.join(OUTPUT_DIRECTORY, file_name)
-        # noinspection PyTypeChecker
-        animator = ani.FuncAnimation(
-
-            self.__init_figure(), self.plt_img_frame,
-            interval=1, frames=range(0, 100 + step, step),
-            repeat=False
-
-        )
-
-        animator.save(file_path, dpi=300)
-        print("!Completed!")
-
-
-if __name__ == "__main__":
-
-    cs = CompressionStage()
-    ig = CompressionStageImgGenerator(cs)
-    #ig.plt_img_frame(plot_img_alone=True)
-    ig.export_filling_gif("filling", 2)
