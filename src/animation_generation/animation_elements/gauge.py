@@ -1,4 +1,5 @@
 from src.animation_generation.costants import IMG_DIRECTORY, OUTPUT_DIRECTORY
+from matplotlib.font_manager import FontProperties
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -6,16 +7,18 @@ import os
 
 def plot_gauge(
 
-        ax, perc, pointer_color="0.8",
-        min_pos=225, max_pos=-45
+        axis, perc, pointer_color="0.8",
+        min_pos=225, max_pos=-45,
+        text=None
 
 ):
 
-    plt.axis('off')
+    axis.set_axis_off()
+
     img = plt.imread(os.path.join(IMG_DIRECTORY, "gauge_base.png"))
     pos = (max_pos - min_pos) * perc + min_pos
 
-    ax.arrow(
+    axis.arrow(
 
         0.5, 0.5,
         0.25 * np.cos(np.radians(pos)),
@@ -26,13 +29,30 @@ def plot_gauge(
     )
 
     circle = plt.Circle((0.5, 0.5), 0.035, color=pointer_color)
-    ax.add_patch(circle)
+    axis.add_patch(circle)
 
-    ax.imshow(img, extent=[0, 1, 0, 1], aspect='auto')
+    if text is not None:
+
+        font = FontProperties()
+        font.set_weight('bold')
+
+        axis.text(
+
+            0.5, 0.2, text,
+            style='normal',
+            size='large',
+            horizontalalignment="center",
+            verticalalignment="center",
+            color='0.2',
+            fontproperties=font
+
+        )
+
+    axis.imshow(img, extent=[0, 1, 0, 1], aspect='auto')
 
 
 if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    plot_gauge(ax, 1)
+    plot_gauge(ax, 1, text="Pressure [MPa]")
     plt.show()
