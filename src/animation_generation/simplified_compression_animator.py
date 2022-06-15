@@ -1,13 +1,9 @@
+from src.animation_generation.costants import IMG_DIRECTORY, OUTPUT_DIRECTORY
 from src.compression_simplified import CompressionSimplified
 import matplotlib.animation as ani
-import matplotlib.gridspec as gs
 import matplotlib.pyplot as plt
 from PIL import Image
 import os
-
-BASE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-OUTPUT_DIRECTORY = os.path.join(BASE_DIRECTORY, "res", "output")
-IMG_DIRECTORY = os.path.join(BASE_DIRECTORY, "res", "img")
 
 
 class CompressionSimplifiedAnimator:

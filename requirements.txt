@@ -3,3 +3,4 @@ numpy~=1.22.4
 sty~=1.0.4
 matplotlib~=3.5.2
 Pillow~=9.1.1
+seaborn~=0.11.2
