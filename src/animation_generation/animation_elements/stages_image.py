@@ -33,8 +33,8 @@ def plot_stages(
 
         if is_active:
 
-            P_max = cs.stage_P_max(n_stages)
-            P_min = cs.stage_P_activation(n_stages)
+            P_max = cs.stage_P_max(stage)
+            P_min = cs.stage_P_activation(stage)
 
             perc_gauge = (P_tank - P_min) / (P_max - P_min)
 
@@ -165,6 +165,6 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(6, 6))
     cs = CompressionSimplified()
-    cs.update_state(8000)
+    cs.update_state(5000)
     plot_stages(ax, cs)
     plt.show()

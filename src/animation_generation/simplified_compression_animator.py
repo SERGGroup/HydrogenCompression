@@ -1,5 +1,5 @@
+from src.animation_generation.animation_elements.stages_image import plot_stages
 from src.animation_generation.costants import IMG_DIRECTORY, OUTPUT_DIRECTORY
-from src.animation_generation.animation_elements.gauge import plot_gauge
 from src.compression_simplified import CompressionSimplified
 import matplotlib.animation as ani
 import matplotlib.pyplot as plt
@@ -34,28 +34,13 @@ class CompressionSimplifiedAnimator:
         self.y_values.append(self.cs.comp_power)
         self.y_right_values.append(self.cs.tp_points[-1].get_variable("P") * 10)
 
-    def __calculate_gauge_perc(self, stage=None):
-
-
-
-        return max(0, min(perc_gauge, 1))
-
     def __init_figure(self):
 
         self.__init_values()
-        self.im = Image.open(os.path.join(IMG_DIRECTORY, "prova.png"))
-        self.height = self.im.size[1]
 
-        self.fig, self.main_axes = plt.subplots(figsize=(16,10))
+        self.fig, self.main_axes = plt.subplots(figsize=(10,10))
         self.main_axes.set_axis_off()
         return self.fig
-
-    def __init_gauges_axes(self):
-
-        ax = self.main_axes.inset_axes([0.25, 0.25, 0.1, 0.1])
-
-        gauge_perc = self.__calculate_gauge_perc()
-        plot_gauge(ax, gauge_perc, pointer_color="0")
 
     def __generate_power_plot(self, ax):
 
@@ -76,6 +61,7 @@ class CompressionSimplifiedAnimator:
 
     def generate_frame(self, i=100, plot_img_alone=False):
 
+            print(i)
             if not plot_img_alone:
 
                 self.__append_values(i)
@@ -88,9 +74,9 @@ class CompressionSimplifiedAnimator:
 
                     self.__append_values(i)
 
-            ax = self.main_axes.inset_axes([0.75, 0.75, 0.3, 0.3])
+            ax = self.main_axes.inset_axes([0.7, 0.5, 0.3, 0.3])
             self.__generate_power_plot(ax)
-            self.__init_gauges_axes()
+            plot_stages(self.main_axes, self.cs)
 
             if plot_img_alone:
 
