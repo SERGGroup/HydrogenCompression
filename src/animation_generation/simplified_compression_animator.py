@@ -74,7 +74,7 @@ class CompressionSimplifiedAnimator:
 
                     self.__append_values(i)
 
-            ax = self.main_axes.inset_axes([0.7, 0.5, 0.3, 0.3])
+            ax = self.main_axes.inset_axes([0.65, 0.2, 0.35, 0.3])
             self.__generate_power_plot(ax)
             plot_stages(self.main_axes, self.cs)
 
