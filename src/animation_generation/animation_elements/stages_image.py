@@ -21,11 +21,32 @@ def plot_stages(
         axis, cs: CompressionSimplified
 
 ):
+    activation_list = list()
+    perc_list = list()
 
     n_stages = cs.n_stages
+    P_tank = cs.tp_points[-1].get_variable("P") * 10
+
     for stage in range(n_stages):
 
-        pass
+        is_active = (P_tank >= cs.stage_P_activation(stage))
+
+        if is_active:
+
+            P_max = cs.stage_P_max(n_stages)
+            P_min = cs.stage_P_activation(n_stages)
+
+            perc_gauge = (P_tank - P_min) / (P_max - P_min)
+
+        else:
+
+            perc_gauge = 0.
+
+        activation_list.append(is_active)
+        perc_list.append(max(0., min(1., perc_gauge)))
+
+    __plot_stages(axis, n_stages, activation_list, perc_list)
+
 
 def __plot_stages(
 
@@ -143,5 +164,7 @@ def __calculate_best_height(axis, n_stages):
 if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    __plot_stages(ax, 3, [True, True, False], [1, 0.43, 0.])
+    cs = CompressionSimplified()
+    cs.update_state(8000)
+    plot_stages(ax, cs)
     plt.show()

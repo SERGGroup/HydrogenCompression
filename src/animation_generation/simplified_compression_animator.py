@@ -36,17 +36,7 @@ class CompressionSimplifiedAnimator:
 
     def __calculate_gauge_perc(self, stage=None):
 
-        if stage is None:
 
-            P_max = self.cs.P_max
-            P_min = self.cs.P_start
-            P_curr = self.cs.tp_points[-1].get_variable("P") * 10
-
-            perc_gauge = (P_curr - P_min) / (P_max - P_min)
-
-        else:
-
-            perc_gauge = 0.
 
         return max(0, min(perc_gauge, 1))
 
