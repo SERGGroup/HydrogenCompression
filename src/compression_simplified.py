@@ -152,6 +152,14 @@ class CompressionSimplified:
 
         self.__comp_power_list[n] = self.flow_rate * (h_out - h_in)
 
+    def stage_P_activation(self, n_stage):
+
+        return pow(self.comp_beta_max, n_stage) * self.P_in
+
+    def stage_P_max(self, n_stage):
+
+        return self.stage_P_activation(n_stage + 1)
+
     def eta_comp(self, beta):
 
         return 0.65

@@ -1,4 +1,5 @@
 from src.animation_generation.costants import IMG_DIRECTORY, OUTPUT_DIRECTORY
+from src.animation_generation.animation_elements.gauge import plot_gauge
 from src.compression_simplified import CompressionSimplified
 import matplotlib.animation as ani
 import matplotlib.pyplot as plt
@@ -24,6 +25,31 @@ class CompressionSimplifiedAnimator:
         self.y_values = list()
         self.y_right_values = list()
 
+    def __append_values(self, i):
+
+        t = self.cs.t_max * float(i) / 100
+        self.cs.update_state(t)
+
+        self.x_values.append(t / 60)
+        self.y_values.append(self.cs.comp_power)
+        self.y_right_values.append(self.cs.tp_points[-1].get_variable("P") * 10)
+
+    def __calculate_gauge_perc(self, stage=None):
+
+        if stage is None:
+
+            P_max = self.cs.P_max
+            P_min = self.cs.P_start
+            P_curr = self.cs.tp_points[-1].get_variable("P") * 10
+
+            perc_gauge = (P_curr - P_min) / (P_max - P_min)
+
+        else:
+
+            perc_gauge = 0.
+
+        return max(0, min(perc_gauge, 1))
+
     def __init_figure(self):
 
         self.__init_values()
@@ -31,7 +57,15 @@ class CompressionSimplifiedAnimator:
         self.height = self.im.size[1]
 
         self.fig, self.main_axes = plt.subplots(figsize=(16,10))
+        self.main_axes.set_axis_off()
         return self.fig
+
+    def __init_gauges_axes(self):
+
+        ax = self.main_axes.inset_axes([0.25, 0.25, 0.1, 0.1])
+
+        gauge_perc = self.__calculate_gauge_perc()
+        plot_gauge(ax, gauge_perc, pointer_color="0")
 
     def __generate_power_plot(self, ax):
 
@@ -50,20 +84,11 @@ class CompressionSimplifiedAnimator:
         ax.set_ylabel('Compressors Power [kW]\n({})'.format(self.colors[0]))
         ax_right.set_ylabel('Tank Pressure [bar]\n({})'.format(self.colors[1]))
 
-    def append_values(self, i):
-
-        t = self.cs.t_max * float(i) / 100
-        self.cs.update_state(t)
-
-        self.x_values.append(t / 60)
-        self.y_values.append(self.cs.comp_power)
-        self.y_right_values.append(self.cs.tp_points[-1].get_variable("P") * 10)
-
     def generate_frame(self, i=100, plot_img_alone=False):
 
             if not plot_img_alone:
 
-                self.append_values(i)
+                self.__append_values(i)
 
             else:
 
@@ -71,11 +96,11 @@ class CompressionSimplifiedAnimator:
 
                 for i in range(0, 100 + 5, 5):
 
-                    self.append_values(i)
+                    self.__append_values(i)
 
-            plt.axis('off')
             ax = self.main_axes.inset_axes([0.75, 0.75, 0.3, 0.3])
             self.__generate_power_plot(ax)
+            self.__init_gauges_axes()
 
             if plot_img_alone:
 
@@ -85,7 +110,7 @@ class CompressionSimplifiedAnimator:
 
             if not plot_img_alone:
 
-                self.append_values(i)
+                self.__append_values(i)
 
             else:
 
@@ -93,7 +118,7 @@ class CompressionSimplifiedAnimator:
 
                 for i in range(0, 100 + 5, 5):
 
-                    self.append_values(i)
+                    self.__append_values(i)
 
             self.__generate_power_plot(self.main_axes)
 
