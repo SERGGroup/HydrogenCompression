@@ -23,7 +23,7 @@ class ExportDict():
 
         }
 
-        for i in range(cs.n_stages):
+        for i in range(self.cs.n_stages):
             self.export_dict.update({
 
                 "comp_{}_power".format(i + 1): list(),
@@ -31,9 +31,10 @@ class ExportDict():
 
             })
 
-        for i in range(len(cs.tp_points)):
+        for prop in self.export_prop_list:
 
-            for prop in self.export_prop_list:
+            for i in range(len(self.cs.tp_points)):
+
                 self.export_dict.update({"{}_{}".format(prop, i + 1): list()})
 
     def append_values_to_dict(self, i):
@@ -52,9 +53,9 @@ class ExportDict():
             self.export_dict["comp_{}_power".format(i + 1)].append(self.cs.comp_power_list[i])
             self.export_dict["IC_{}_power".format(i + 1)].append(self.cs.IC_power_list[i])
 
-        for i in range(len(self.cs.tp_points)):
+        for prop in self.export_prop_list:
 
-            for prop in self.export_prop_list:
+            for i in range(len(self.cs.tp_points)):
 
                 self.export_dict["{}_{}".format(prop, i + 1)].append(self.cs.tp_points[i].get_variable(prop))
 

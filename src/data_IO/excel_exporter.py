@@ -9,7 +9,7 @@ def export_to_excel(
 
         excel_dir_path="",
         excel_name="result.xlsx",
-        add_date_time=False,
+        add_date_time=True,
         sheet_name='data'
 
 ):
@@ -51,7 +51,7 @@ def export_to_excel(
                 result_dict = func(*args, **kwargs)
 
                 df = pd.DataFrame(result_dict)
-                writer = pd.ExcelWriter(output_file, engine="openpyxl", mode="a")
+                writer = pd.ExcelWriter(output_file, engine="openpyxl", mode="w")
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
                 writer.save()
 
