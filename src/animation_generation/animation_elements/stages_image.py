@@ -1,8 +1,7 @@
 from src.animation_generation.animation_elements.gauge import plot_gauge
 from src.compression_simplified import CompressionSimplified
-from src.animation_generation.costants import IMG_DIRECTORY
+from src.costants import IMG_DIRECTORY
 import matplotlib.pyplot as plt
-import numpy as np
 import os
 
 
@@ -141,7 +140,13 @@ def __add_gauge(ax, perc=0., stage_type=""):
 
     gauge_ax = ax.inset_axes(position)
     gauge_ax.set_axis_off()
-    plot_gauge(gauge_ax, perc, pointer_color='0.5')
+    plot_gauge(
+
+        gauge_ax, perc,
+        pointer_color='0.5',
+        noise_sigma=0.02
+
+    )
 
 
 def __calculate_best_height(axis, n_stages):

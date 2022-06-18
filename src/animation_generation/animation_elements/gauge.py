@@ -1,5 +1,5 @@
-from src.animation_generation.costants import IMG_DIRECTORY
 from matplotlib.font_manager import FontProperties
+from src.costants import IMG_DIRECTORY
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -9,13 +9,15 @@ def plot_gauge(
 
         axis, perc, pointer_color="0.8",
         min_pos=225, max_pos=-45,
-        text=None
+        text=None, noise_sigma=0.
 
 ):
 
     axis.set_axis_off()
 
     img = plt.imread(os.path.join(IMG_DIRECTORY, "gauge_base.png"))
+
+    perc = __add_noise(perc, noise_sigma)
     pos = (max_pos - min_pos) * perc + min_pos
 
     axis.arrow(
@@ -49,6 +51,12 @@ def plot_gauge(
         )
 
     axis.imshow(img, extent=[0, 1, 0, 1], aspect='auto')
+
+
+def __add_noise(perc, noise_sigma):
+
+    noise = noise_sigma * np.random.randn()
+    return perc + noise
 
 
 if __name__ == "__main__":

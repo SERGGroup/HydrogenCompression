@@ -15,8 +15,8 @@ class CompressionSimplified:
             P_in=30,
 
             n_stages=3,
-            flow_rate=0.002,
-            tank_volume=3,
+            flow_rate=0.02,
+            tank_volume=30,
 
             staging_mode="Standard"
 
@@ -26,12 +26,15 @@ class CompressionSimplified:
         self.P_max = P_max
         self.P_start = P_start
         self.P_in = P_in
+        self.hydrogen_HHV = 141880
 
         self.n_stages = n_stages
         self.flow_rate = flow_rate
         self.tank_volume = tank_volume
 
         self.staging_mode = staging_mode
+
+        self.time = 0.
 
         self.__init_points()
         self.__init_other_values()
@@ -47,11 +50,13 @@ class CompressionSimplified:
             self.tp_points[i].set_variable("P", self.P_in / 10)
             self.tp_points[i].set_variable("T", self.T_IC)
 
-        self.__comp_power_list = list()
+        self.comp_power_list = list()
+        self.IC_power_list = list()
 
         for i in range(self.n_stages):
 
-            self.__comp_power_list.append(0.)
+            self.comp_power_list.append(0.)
+            self.IC_power_list.append(0.)
 
     def __init_other_values(self):
 
@@ -91,6 +96,7 @@ class CompressionSimplified:
 
             time = self.t_max
 
+        self.time = time
         m_tot = time * self.flow_rate + self.m_start
         rho = m_tot / self.tank_volume
 
@@ -150,7 +156,9 @@ class CompressionSimplified:
         self.tp_points[i_0 + 2].set_variable("P", beta * P_in)
         self.tp_points[i_0 + 2].set_variable("T", self.T_IC)
 
-        self.__comp_power_list[n] = self.flow_rate * (h_out - h_in)
+        h_out_ic = self.tp_points[i_0 + 2].get_variable("h")
+        self.comp_power_list[n] = self.flow_rate * (h_out - h_in)
+        self.IC_power_list[n] = self.flow_rate * (h_out - h_out_ic)
 
     def stage_P_activation(self, n_stage):
 
@@ -167,7 +175,30 @@ class CompressionSimplified:
     @property
     def comp_power(self):
 
-        return sum(self.__comp_power_list)
+        return sum(self.comp_power_list)
+
+    def current_efficiency(self, consider_chemichal_power=True):
+
+        if consider_chemichal_power:
+
+            chemical_power = self.hydrogen_HHV * self.flow_rate
+
+            output_energy = chemical_power
+            input_energy = chemical_power + self.comp_power
+
+        else:
+
+            input_energy = self.comp_power
+            dh = self.tp_points[-1].get_variable("h") - self.tp_points[0].get_variable("h")
+            output_energy = max(0, dh) * self.flow_rate
+
+        if input_energy == 0:
+
+            return 1.
+
+        else:
+
+            return output_energy / input_energy
 
     def __str__(self):
 
